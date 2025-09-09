@@ -2,21 +2,17 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>MQTT Web Client - HiveMQ Cloud</title>
+  <title>MQTT Auto Publisher</title>
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 <body>
-  <h2>MQTT Web Client (HiveMQ Cloud)</h2>
-
-  <label for="msg">Nhập giá trị:</label>
-  <input type="text" id="msg" placeholder="Nhập dữ liệu">
-  <button onclick="sendMsg()">Gửi MQTT</button>
-
-  <p id="status">Trạng thái: Đang kết nối...</p>
+  <h2>MQTT Auto Publisher (HiveMQ Cloud)</h2>
+  <p id="status">Tr?ng th�i: ?ang k?t n?i...</p>
+  <p>Gi� tr? hi?n t?i: <span id="value">0</span></p>
   <div id="received"></div>
 
   <script>
-    // Cấu hình kết nối HiveMQ Cloud
+    // C?u h�nh k?t n?i HiveMQ Cloud
     const options = {
       username: "Son75Son75",
       password: "Son75Son75",
@@ -25,37 +21,42 @@
       reconnectPeriod: 1000
     };
 
-    // Kết nối bằng WebSocket Secure (port 8884)
+    // K?t n?i WebSocket Secure (port 8884)
     const client = mqtt.connect(
       "wss://f1e5f5ad51204b15b4b3931fe01978ae.s1.eu.hivemq.cloud:8884/mqtt",
       options
     );
 
     client.on("connect", function () {
-      document.getElementById("status").innerText = "✅ Đã kết nối HiveMQ Cloud";
+      document.getElementById("status").innerText = "? ?� k?t n?i HiveMQ Cloud";
 
-      // Subscribe thử để nhận lại dữ liệu đã gửi
+      // Subscribe ?? xem l?i d? li?u m�nh publish
       client.subscribe("factory/line1/cmd");
+
+      // B?t ??u g?i d? li?u t? ??ng
+      startAutoPublish();
     });
 
     client.on("error", function (err) {
-      document.getElementById("status").innerText = "❌ Lỗi kết nối: " + err;
+      document.getElementById("status").innerText = "? L?i k?t n?i: " + err;
     });
 
     client.on("message", function (topic, message) {
-      document.getElementById("received").innerHTML =
-        "📥 Nhận từ " + topic + ": " + message.toString();
+      const div = document.getElementById("received");
+      div.innerHTML =
+        "?? Nh?n t? " + topic + ": " + message.toString();
     });
 
-    // Hàm gửi dữ liệu
-    function sendMsg() {
-      const msg = document.getElementById("msg").value;
-      if (msg) {
-        client.publish("factory/line1/cmd", msg);
-        alert("Đã gửi: " + msg);
-      } else {
-        alert("Vui lòng nhập giá trị trước khi gửi!");
-      }
+    // Bi?n ??m t? ??ng
+    let counter = 0;
+    function startAutoPublish() {
+      setInterval(() => {
+        client.publish("factory/line1/cmd", counter.toString());
+        document.getElementById("value").innerText = counter;
+
+        counter++;
+        if (counter > 100) counter = 0;
+      }, 1000); // 1000ms = 1 gi�y
     }
   </script>
 </body>
