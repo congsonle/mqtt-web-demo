@@ -7,12 +7,12 @@
 </head>
 <body>
   <h2>MQTT Auto Publisher (HiveMQ Cloud)</h2>
-  <p id="status">Tr?ng th�i: ?ang k?t n?i...</p>
-  <p>Gi� tr? hi?n t?i: <span id="value">0</span></p>
+  <p id="status">Trạng thái: Đang kết nối...</p>
+  <p>Giá trị hiện tại: <span id="value">0</span></p>
   <div id="received"></div>
 
   <script>
-    // C?u h�nh k?t n?i HiveMQ Cloud
+    // Cấu hình kết nối HiveMQ Cloud
     const options = {
       username: "Son75Son75",
       password: "Son75Son75",
@@ -21,33 +21,33 @@
       reconnectPeriod: 1000
     };
 
-    // K?t n?i WebSocket Secure (port 8884)
+    // Kết nối WebSocket Secure (port 8884)
     const client = mqtt.connect(
       "wss://f1e5f5ad51204b15b4b3931fe01978ae.s1.eu.hivemq.cloud:8884/mqtt",
       options
     );
 
     client.on("connect", function () {
-      document.getElementById("status").innerText = "? ?� k?t n?i HiveMQ Cloud";
+      document.getElementById("status").innerText = "✅ Đã kết nối HiveMQ Cloud";
 
-      // Subscribe ?? xem l?i d? li?u m�nh publish
+      // Subscribe để xem lại dữ liệu mình publish
       client.subscribe("factory/line1/cmd");
 
-      // B?t ??u g?i d? li?u t? ??ng
+      // Bắt đầu gửi dữ liệu tự động
       startAutoPublish();
     });
 
     client.on("error", function (err) {
-      document.getElementById("status").innerText = "? L?i k?t n?i: " + err;
+      document.getElementById("status").innerText = "❌ Lỗi kết nối: " + err;
     });
 
     client.on("message", function (topic, message) {
       const div = document.getElementById("received");
       div.innerHTML =
-        "?? Nh?n t? " + topic + ": " + message.toString();
+        "📥 Nhận từ " + topic + ": " + message.toString();
     });
 
-    // Bi?n ??m t? ??ng
+    // Biến đếm tự động
     let counter = 0;
     function startAutoPublish() {
       setInterval(() => {
@@ -56,7 +56,7 @@
 
         counter++;
         if (counter > 100) counter = 0;
-      }, 1000); // 1000ms = 1 gi�y
+      }, 1000); // 1000ms = 1 giây
     }
   </script>
 </body>
